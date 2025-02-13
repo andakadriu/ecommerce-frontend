@@ -1,17 +1,38 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { Container, Table, Button } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
+import axios from "axios";
 
 const ProductList = ({ products, setProducts }) => {
   const navigate = useNavigate();
+
+  const fetchProducts = async () => {
+    try {
+      const response = await axios.get("http://localhost:21673/Product/ProductsList");
+      setProducts(response.data); // Update the list with the fetched products
+    } catch (error) {
+      console.error("Error fetching products:", error);
+    }
+  };
 
   const handleEdit = (id) => {
     navigate(`/admin/edit-product/${id}`);
   };
 
   const handleDelete = (id) => {
-    setProducts(products.filter((p) => p.id !== id));
+    axios
+      .delete(`http://localhost:21673/Product/Delete/${id}`)
+      .then(() => {
+        setProducts(products.filter((p) => p.id !== id)); // Update the list locally after deletion
+      })
+      .catch((error) => {
+        console.error("Error deleting product:", error);
+      });
   };
+
+  useEffect(() => {
+    fetchProducts(); // Fetch the products when the component loads
+  }, []);
 
   return (
     <Container>
@@ -31,13 +52,13 @@ const ProductList = ({ products, setProducts }) => {
         <tbody>
           {products.length > 0 ? (
             products.map((product) => (
-              <tr key={product.id}>
-                <td>{product.id}</td>
+              <tr key={product.productID}>
+                <td>{product.productID}</td>
                 <td>{product.name}</td>
                 <td>{product.category}</td>
                 <td>
                   <img
-                    src={product.image}
+                    src={product.images}
                     alt={product.name}
                     style={{
                       width: "50px",
@@ -46,8 +67,14 @@ const ProductList = ({ products, setProducts }) => {
                     }}
                   />
                 </td>
-                <td>{product.stock}</td>
-                <td>${product.price.toFixed(2)}</td>
+                <td>{product.stockQuantity}</td>
+                <td>
+  $
+  {product.price && !isNaN(product.price)
+    ? product.price.toFixed(2)
+    : "N/A"}
+</td>
+
                 <td>
                   <Button
                     variant="warning"
@@ -55,7 +82,7 @@ const ProductList = ({ products, setProducts }) => {
                     onClick={() => handleEdit(product.id)}
                   >
                     Edit
-                  </Button>{" "}
+                  </Button>
                   <Button
                     variant="danger"
                     size="sm"
