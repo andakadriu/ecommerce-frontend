@@ -1,18 +1,32 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { useLocation } from "react-router-dom";
 
-const Shop = ({ addToCart, products }) => {
+const fetchProductsByCategory = async (categoryId) => {
+  try {
+    const response = await fetch(
+      `http://localhost:21673/Product/ProductCategoryList?categoryId=${categoryId}`
+    );
+    const data = await response.json();
+    return data; 
+  } catch (error) {
+    console.error("Error fetching products:", error);
+    return [];
+  }
+};
+
+const Shop = ({ addToCart }) => {
   const location = useLocation();
   const queryParams = new URLSearchParams(location.search);
   const category = queryParams.get("category") || "all";
 
-  const filteredProducts =
-    category === "all"
-      ? products
-      : products.filter(
-          (product) =>
-            product.category.toLowerCase() === category.toLowerCase()
-        );
+  const [products, setProducts] = useState([]);
+
+  useEffect(() => {
+  
+    fetchProductsByCategory(category).then((data) => {
+      setProducts(data);
+    });
+  }, [category]);
 
   return (
     <div className="untree_co-section product-section before-footer-section">
@@ -20,13 +34,12 @@ const Shop = ({ addToCart, products }) => {
         <h2 className="text-center mb-4">
           {category.toUpperCase()} PRODUCTS
         </h2>
-
         <div className="row">
-          {filteredProducts.map((product) => (
+          {products.map((product) => (
             <div key={product.id} className="col-12 col-md-4 col-lg-3 mb-5">
               <div className="product-item">
                 <img
-                  src={product.image}
+                  src={product.image} 
                   className="img-fluid product-thumbnail"
                   alt={product.title}
                 />
@@ -49,8 +62,7 @@ const Shop = ({ addToCart, products }) => {
             </div>
           ))}
         </div>
-
-        {filteredProducts.length === 0 && (
+        {products.length === 0 && (
           <p className="text-center">No products found in this category.</p>
         )}
       </div>

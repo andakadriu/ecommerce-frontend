@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Container, Form, Button } from "react-bootstrap";
 import { useParams, useNavigate } from "react-router-dom";
+import axios from "axios";
 
 const EditProduct = ({ products, setProducts }) => {
   const { id } = useParams();
@@ -49,10 +50,10 @@ const EditProduct = ({ products, setProducts }) => {
     }
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     const updatedProduct = {
-      ...productToEdit,
+      id: productToEdit.id,
       name: formData.name,
       category: formData.category.toLowerCase(),
       image: formData.image,
@@ -60,10 +61,21 @@ const EditProduct = ({ products, setProducts }) => {
       price: parseFloat(formData.price),
     };
 
-    setProducts(
-      products.map((p) => (p.id === productToEdit.id ? updatedProduct : p))
-    );
-    navigate("/admin/products");
+    try {
+      const response = await axios.put(
+        `http://localhost:21673/Product/UpdateProduct?id=${productToEdit.id}`,
+        updatedProduct
+      );
+      const updatedData = response.data;
+
+      setProducts(
+        products.map((p) => (p.id === productToEdit.id ? updatedData : p))
+      );
+
+      navigate("/admin/products");
+    } catch (error) {
+      console.error("Error updating product:", error);
+    }
   };
 
   return (

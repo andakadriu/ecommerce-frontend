@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { Container, Form, Button } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
+import axios from "axios";
 
 const AddProduct = ({ addNewProduct }) => {
   const navigate = useNavigate();
@@ -31,16 +32,24 @@ const AddProduct = ({ addNewProduct }) => {
   const handleSubmit = (e) => {
     e.preventDefault();
     const newProduct = {
-      id: Date.now(),
       name: formData.name,
       category: formData.category.toLowerCase(),
       image: formData.image,
       stock: parseInt(formData.stock, 10),
       price: parseFloat(formData.price),
     };
-    addNewProduct(newProduct);
-    setFormData({ name: "", category: "", image: "", stock: "", price: "" });
-    navigate("/admin/products");
+
+    axios
+      .post("http://localhost:21673/Product/AddProduct", newProduct)
+      .then((response) => {
+        const addedProduct = response.data;
+        addNewProduct(addedProduct);
+        setFormData({ name: "", category: "", image: "", stock: "", price: "" });
+        navigate("/admin/products");
+      })
+      .catch((error) => {
+        console.error("Error adding product:", error);
+      });
   };
 
   return (
