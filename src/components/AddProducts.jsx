@@ -10,7 +10,7 @@ const AddProduct = ({ addNewProduct }) => {
     description: "",
     categoryID: "", // Use categoryID here for the dropdown
     images: [],
-    stock: "",
+    stockQuantity: "",
     price: "",
   });
   const [categories, setCategories] = useState([]);
@@ -67,7 +67,7 @@ const AddProduct = ({ addNewProduct }) => {
       description: formData.description,
       categoryID: formData.categoryID, // Use categoryID
       images: formData.images,
-      stock: parseInt(formData.stock, 10),
+      stockQuantity: parseInt(formData.stockQuantity, 10),
       price: parseFloat(formData.price),
     };
 
@@ -81,7 +81,7 @@ const AddProduct = ({ addNewProduct }) => {
           description: "",
           categoryID: "",
           images: [],
-          stock: "",
+          stockQuantity: "",
           price: "",
         });
         navigate("/admin/products"); // Redirect to the product list page
@@ -169,9 +169,9 @@ const AddProduct = ({ addNewProduct }) => {
           <Form.Label>Stock</Form.Label>
           <Form.Control
             type="number"
-            name="stock"
+            name="stockQuantity"
             placeholder="Enter stock quantity"
-            value={formData.stock}
+            value={formData.stockQuantity}
             onChange={handleInputChange}
             required
           />
