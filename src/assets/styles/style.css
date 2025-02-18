@@ -981,4 +981,42 @@ textarea {
     flex: 1;
     overflow-y: auto;
   }
-  
+
+.custom-pagination {
+  background: #fff;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 10px 15px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  display: inline-block;
+}
+
+.custom-pagination .page-item {
+  margin: 0 5px;
+}
+
+.custom-pagination .page-link {
+  color: #385174;
+  background: transparent;
+  border: none;
+  font-size: 1rem;
+  transition: all 0.3s ease;
+  cursor: pointer;
+}
+
+.custom-pagination .page-link:hover {
+  background: #385174;
+  color: #fff;
+  border-radius: 4px;
+}
+
+.custom-pagination .page-item.active .page-link {
+  background: #385174;
+  color: #fff;
+  border-radius: 4px;
+}
+
+.custom-pagination .page-item.disabled .page-link {
+  color: #ccc;
+  cursor: not-allowed;
+}
