@@ -20,7 +20,7 @@ const AddProduct = ({ addNewProduct }) => {
     const fetchCategories = async () => {
       const token = localStorage.getItem("token");
       try {
-        const response = await axios.get("http://localhost:21673/Category/CategoriesList", {
+        const response = await axios.get("https://localhost:7299/Category/CategoriesList", {
           headers: {
             Authorization: `Bearer ${token}`,
           },
@@ -72,7 +72,7 @@ const AddProduct = ({ addNewProduct }) => {
     };
 
     axios
-      .post("http://localhost:21673/Product/Create", newProduct)
+      .post("https://localhost:7299/Product/Create", newProduct)
       .then((response) => {
         const addedProduct = response.data;
         addNewProduct(addedProduct); // Add the newly added product to the list

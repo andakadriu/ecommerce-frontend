@@ -5,7 +5,7 @@ import axios from 'axios';
 const Shop = ({ addToCart }) => {
   const location = useLocation();
   const queryParams = new URLSearchParams(location.search);
-  const category = queryParams.get("category") || "all"; // Default to "all" category
+  const category = queryParams.get("category") || "all"; 
 
   const [products, setProducts] = useState([]);
   const [filteredProducts, setFilteredProducts] = useState([]);
@@ -13,8 +13,8 @@ const Shop = ({ addToCart }) => {
   useEffect(() => {
     const fetchAllProducts = async () => {
       try {
-        const response = await axios.get('http://localhost:21673/Product/ProductsList');
-        setProducts(response.data);  // Assuming response.data contains the list of all products
+        const response = await axios.get('https://localhost:7299/Product/ProductsList');
+        setProducts(response.data); 
       } catch (error) {
         console.error('Error fetching all products:', error);
       }
@@ -23,7 +23,7 @@ const Shop = ({ addToCart }) => {
     fetchAllProducts();
   }, []);
 
-  // Filter products based on the selected category
+  
   useEffect(() => {
     if (category === "all") {
       setFilteredProducts(products);
@@ -52,11 +52,18 @@ const Shop = ({ addToCart }) => {
             return (
               <div key={product.id || product.title} className="col-12 col-md-4 col-lg-3 mb-5"> 
                 <div className="product-item">
-                  <img
-                    src={imageUrl}  // Use the image URL
-                    className="img-fluid product-thumbnail"
-                    alt={product.title || "Product"}  // Use "Product" if no title
-                  />
+                <img
+  src={imageUrl}
+  className="img-fluid product-thumbnail"
+  alt={product.title || "Product"}
+  style={{
+    width: "100%",
+    height: "200px",
+    objectFit: "cover",
+    borderRadius: "8px"
+  }}
+/>
+
                   <h3 className="product-title">{product.name}</h3>  
                   <strong className="product-price">
                     ${product.price && !isNaN(product.price) ? product.price.toFixed(2) : "N/A"}
@@ -69,9 +76,9 @@ const Shop = ({ addToCart }) => {
                     >
                       <i className="fas fa-shopping-cart"></i> Add to Cart
                     </button>
-                    <button className="btn btn-favorite">
+                    {/* <button className="btn btn-favorite">
                       <i className="fas fa-heart"></i> Favorite
-                    </button>
+                    </button> */}
                   </div>
                 </div>
               </div>

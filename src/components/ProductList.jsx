@@ -1,3 +1,4 @@
+// ProductList.js
 import React, { useState, useEffect } from "react";
 import { Container, Table, Button } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
@@ -8,30 +9,32 @@ const ProductList = ({ products, setProducts }) => {
 
   const fetchProducts = async () => {
     try {
-      const response = await axios.get("http://localhost:21673/Product/ProductsList");
-      setProducts(response.data); // Update the list with the fetched products
+      const response = await axios.get("https://localhost:7299/Product/ProductsList");
+      setProducts(response.data);
     } catch (error) {
       console.error("Error fetching products:", error);
     }
   };
 
   const handleEdit = (id) => {
-    navigate(`/admin/edit-product/${id}`);
+    navigate(`/admin/products/edit/${id}`);
   };
 
-  const handleDelete = (id) => {
-    axios
-      .delete(`http://localhost:21673/Product/Delete/${id}`)
-      .then(() => {
-        setProducts(products.filter((p) => p.id !== id)); // Update the list locally after deletion
-      })
-      .catch((error) => {
-        console.error("Error deleting product:", error);
-      });
+  const handleDelete = async (id) => {
+    if (window.confirm("Are you sure you want to delete this product?")) {
+      try {
+        await axios.post(`https://localhost:7299/Product/Delete/${id}`);
+        setProducts((prev) => prev.filter((p) => p.productID !== id));
+        console.log("Product deleted successfully");
+      } catch (error) {
+        console.error("Error deleting product:", error.response ? error.response.data : error);
+      }
+    }
   };
+  
 
   useEffect(() => {
-    fetchProducts(); // Fetch the products when the component loads
+    fetchProducts();
   }, []);
 
   return (
@@ -55,39 +58,21 @@ const ProductList = ({ products, setProducts }) => {
               <tr key={product.productID}>
                 <td>{product.productID}</td>
                 <td>{product.name}</td>
-                <td>{product.category}</td>
+                <td>{product.categoryID}</td>
                 <td>
                   <img
                     src={product.images}
                     alt={product.name}
-                    style={{
-                      width: "50px",
-                      height: "50px",
-                      objectFit: "cover",
-                    }}
+                    style={{ width: "50px", height: "50px", objectFit: "cover" }}
                   />
                 </td>
                 <td>{product.stockQuantity}</td>
+                <td>$ {product.price && !isNaN(product.price) ? product.price.toFixed(2) : "N/A"}</td>
                 <td>
-  $
-  {product.price && !isNaN(product.price)
-    ? product.price.toFixed(2)
-    : "N/A"}
-</td>
-
-                <td>
-                  <Button
-                    variant="warning"
-                    size="sm"
-                    onClick={() => handleEdit(product.id)}
-                  >
+                  <Button variant="warning" size="sm" onClick={() => handleEdit(product.productID)}>
                     Edit
                   </Button>
-                  <Button
-                    variant="danger"
-                    size="sm"
-                    onClick={() => handleDelete(product.id)}
-                  >
+                  <Button variant="danger" size="sm" onClick={() => handleDelete(product.productID)}>
                     Delete
                   </Button>
                 </td>
@@ -95,9 +80,7 @@ const ProductList = ({ products, setProducts }) => {
             ))
           ) : (
             <tr>
-              <td colSpan="7" className="text-center">
-                No products available.
-              </td>
+              <td colSpan="7" className="text-center">No products available.</td>
             </tr>
           )}
         </tbody>

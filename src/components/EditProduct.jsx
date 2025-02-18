@@ -1,3 +1,4 @@
+// EditProduct.js
 import React, { useState, useEffect } from "react";
 import { Container, Form, Button } from "react-bootstrap";
 import { useParams, useNavigate } from "react-router-dom";
@@ -6,34 +7,43 @@ import axios from "axios";
 const EditProduct = ({ products, setProducts }) => {
   const { id } = useParams();
   const navigate = useNavigate();
-  const productToEdit = products.find((p) => p.id === parseInt(id));
+  const productToEdit = products.find((p) => p.productID === parseInt(id));
 
   const [formData, setFormData] = useState({
     name: "",
     category: "",
-    image: "",
+    images: [],
     stock: "",
     price: "",
   });
 
   useEffect(() => {
-    if (productToEdit) {
+    if (!productToEdit) {
+      axios.get(`https://localhost:7299/Product/Get/${id}`)
+        .then((response) => {
+          setFormData({
+            name: response.data.name,
+            category: response.data.categoryID.toString(),
+            images: response.data.images || [],
+            stock: response.data.stockQuantity.toString(),
+            price: response.data.price.toString(),
+          });
+        })
+        .catch((error) => console.error("Error fetching product:", error));
+    } else {
       setFormData({
         name: productToEdit.name,
-        category: productToEdit.category,
-        image: productToEdit.image,
-        stock: productToEdit.stock.toString(),
+        category: productToEdit.categoryID.toString(),
+        images: productToEdit.images || [],
+        stock: productToEdit.stockQuantity.toString(),
         price: productToEdit.price.toString(),
       });
     }
-  }, [productToEdit]);
+  }, [productToEdit, id]);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
+    setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
   const handleFileChange = (e) => {
@@ -41,10 +51,7 @@ const EditProduct = ({ products, setProducts }) => {
     if (file) {
       const reader = new FileReader();
       reader.onloadend = () => {
-        setFormData((prev) => ({
-          ...prev,
-          image: reader.result,
-        }));
+        setFormData((prev) => ({ ...prev, images: [reader.result] }));
       };
       reader.readAsDataURL(file);
     }
@@ -53,28 +60,30 @@ const EditProduct = ({ products, setProducts }) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     const updatedProduct = {
-      id: productToEdit.id,
+      productID: parseInt(id),
       name: formData.name,
-      category: formData.category.toLowerCase(),
-      image: formData.image,
-      stock: parseInt(formData.stock, 10),
+      description: productToEdit?.description || "", 
       price: parseFloat(formData.price),
+      stockQuantity: parseInt(formData.stock, 10),
+      categoryID: parseInt(formData.category, 10),
+      products: [],
+      isDeleted: false,
+      category: formData.category,
+      images: formData.images,
     };
 
     try {
-      const response = await axios.put(
-        `http://localhost:21673/Product/UpdateProduct?id=${productToEdit.id}`,
-        updatedProduct
-      );
-      const updatedData = response.data;
+      const response = await axios.post(`https://localhost:7299/Product/Update`, updatedProduct, {
+        headers: { "Content-Type": "application/json" },
+      });
 
-      setProducts(
-        products.map((p) => (p.id === productToEdit.id ? updatedData : p))
+      console.log("Update Response:", response.data);
+      setProducts((prev) =>
+        prev.map((p) => (p.productID === parseInt(id) ? { ...p, ...updatedProduct } : p))
       );
-
       navigate("/admin/products");
     } catch (error) {
-      console.error("Error updating product:", error);
+      console.error("Error updating product:", error.response ? error.response.data : error);
     }
   };
 
@@ -84,78 +93,31 @@ const EditProduct = ({ products, setProducts }) => {
       <Form onSubmit={handleSubmit}>
         <Form.Group controlId="formName" className="mb-3">
           <Form.Label>Product Name</Form.Label>
-          <Form.Control
-            type="text"
-            name="name"
-            placeholder="Enter product name"
-            value={formData.name}
-            onChange={handleInputChange}
-            required
-          />
+          <Form.Control type="text" name="name" value={formData.name} onChange={handleInputChange} required />
         </Form.Group>
 
         <Form.Group controlId="formCategory" className="mb-3">
           <Form.Label>Category</Form.Label>
-          <Form.Control
-            type="text"
-            name="category"
-            placeholder="Enter category"
-            value={formData.category}
-            onChange={handleInputChange}
-            required
-          />
+          <Form.Control type="text" name="category" value={formData.category} onChange={handleInputChange} required />
         </Form.Group>
 
         <Form.Group controlId="formImage" className="mb-3">
           <Form.Label>Product Image</Form.Label>
-          <Form.Control
-            type="file"
-            name="image"
-            onChange={handleFileChange}
-            accept="image/*"
-          />
-          {formData.image && (
-            <img
-              src={formData.image}
-              alt="Preview"
-              style={{
-                width: "100px",
-                height: "100px",
-                marginTop: "10px",
-                objectFit: "cover",
-              }}
-            />
-          )}
+          <Form.Control type="file" onChange={handleFileChange} accept="image/*" />
+          {formData.images.length > 0 && <img src={formData.images[0]} alt="Preview" style={{ width: "100px", height: "100px", marginTop: "10px", objectFit: "cover" }} />}
         </Form.Group>
 
         <Form.Group controlId="formStock" className="mb-3">
           <Form.Label>Stock</Form.Label>
-          <Form.Control
-            type="number"
-            name="stock"
-            placeholder="Enter stock quantity"
-            value={formData.stock}
-            onChange={handleInputChange}
-            required
-          />
+          <Form.Control type="number" name="stock" value={formData.stock} onChange={handleInputChange} required />
         </Form.Group>
 
         <Form.Group controlId="formPrice" className="mb-3">
           <Form.Label>Price</Form.Label>
-          <Form.Control
-            type="number"
-            step="0.01"
-            name="price"
-            placeholder="Enter price"
-            value={formData.price}
-            onChange={handleInputChange}
-            required
-          />
+          <Form.Control type="number" step="0.01" name="price" value={formData.price} onChange={handleInputChange} required />
         </Form.Group>
 
-        <Button variant="primary" type="submit">
-          Update Product
-        </Button>
+        <Button variant="primary" type="submit">Update Product</Button>
       </Form>
     </Container>
   );

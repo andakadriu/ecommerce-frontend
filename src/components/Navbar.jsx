@@ -16,8 +16,12 @@ const Navbar = ({ cartItems }) => {
             <li><Link className="nav-link" to="/shop">All</Link></li>
             <li><Link className="nav-link" to="/shop?category=bedroom">Bedroom</Link></li>
             <li><Link className="nav-link" to="/shop?category=kitchen">Kitchen</Link></li>
-            <li><Link className="nav-link" to="/shop?category=lightening">Lightening</Link></li>
-            <li><Link className="nav-link" to="/shop?category=decors">Decors</Link></li>
+            <li><Link className="nav-link" to="/shop?category=lighting">Lighting</Link></li>
+            <li><Link className="nav-link" to="/shop?category=decoration">Decoration</Link></li>
+            <li><Link className="nav-link" to="/shop?category=furniture">Furniture</Link></li>
+            <li><Link className="nav-link" to="/shop?category=bathroom">Bathroom</Link></li>
+
+
 
           </ul>
 

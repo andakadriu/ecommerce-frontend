@@ -7,22 +7,26 @@ const Cart = ({ cartItems = [], updateQuantity, removeFromCart }) => {
   const navigate = useNavigate();
 
   const getSubtotal = () => {
-    return cartItems.reduce((total, item) => total + item.price * item.quantity, 0);
+    return cartItems.reduce(
+      (total, item) => total + item.price * item.quantity,
+      0
+    );
   };
 
   const getShippingCost = () => {
-    return getSubtotal() >= 50 ? 0 : 2; 
+    return getSubtotal() >= 50 ? 0 : 2;
   };
 
   const getTotalPrice = () => {
     let total = getSubtotal() + getShippingCost();
     if (discountApplied) {
-      total = total * 0.9; 
+      total = total * 0.9;
     }
     return total.toFixed(2);
   };
 
-  const handleApplyCoupon = () => {
+  const handleApplyCoupon = (e) => {
+    e.preventDefault();
     if (couponCode === "DISCOUNT10") {
       setDiscountApplied(true);
     } else {
@@ -39,7 +43,6 @@ const Cart = ({ cartItems = [], updateQuantity, removeFromCart }) => {
               <table className="table">
                 <thead>
                   <tr>
-                    <th className="product-thumbnail">Image</th>
                     <th className="product-name">Product</th>
                     <th className="product-price">Price</th>
                     <th className="product-quantity">Quantity</th>
@@ -50,16 +53,15 @@ const Cart = ({ cartItems = [], updateQuantity, removeFromCart }) => {
                 <tbody>
                   {cartItems.length === 0 ? (
                     <tr>
-                      <td colSpan="6" className="text-center">Your cart is empty</td>
+                      <td colSpan="6" className="text-center">
+                        Your cart is empty
+                      </td>
                     </tr>
                   ) : (
                     cartItems.map((item) => (
-                      <tr key={item.id}>
-                        <td className="product-thumbnail">
-                          <img src={item.image} alt={item.title} className="img-fluid" />
-                        </td>
+                      <tr key={item.cartItemId}>
                         <td className="product-name">
-                          <h2 className="h5 text-black">{item.title}</h2>
+                          <h2 className="h5 text-black">{item.name}</h2>
                         </td>
                         <td>€{item.price.toFixed(2)}</td>
                         <td>
@@ -71,7 +73,12 @@ const Cart = ({ cartItems = [], updateQuantity, removeFromCart }) => {
                               <button
                                 className="btn btn-outline-black decrease"
                                 type="button"
-                                onClick={() => updateQuantity(item.id, Math.max(1, item.quantity - 1))}
+                                onClick={() =>
+                                  updateQuantity(
+                                    item.cartItemId,
+                                    Math.max(1, item.quantity - 1)
+                                  )
+                                }
                               >
                                 -
                               </button>
@@ -86,7 +93,9 @@ const Cart = ({ cartItems = [], updateQuantity, removeFromCart }) => {
                               <button
                                 className="btn btn-outline-black increase"
                                 type="button"
-                                onClick={() => updateQuantity(item.id, item.quantity + 1)}
+                                onClick={() =>
+                                  updateQuantity(item.cartItemId, item.quantity + 1)
+                                }
                               >
                                 +
                               </button>
@@ -97,7 +106,7 @@ const Cart = ({ cartItems = [], updateQuantity, removeFromCart }) => {
                         <td>
                           <button
                             className="btn btn-black btn-sm"
-                            onClick={() => removeFromCart(item.id)}
+                            onClick={() => removeFromCart(item.cartItemId)}
                           >
                             X
                           </button>
@@ -115,7 +124,9 @@ const Cart = ({ cartItems = [], updateQuantity, removeFromCart }) => {
           <div className="col-md-4">
             <div className="row mt-4">
               <div className="col-md-12">
-                <label className="text-black h4" htmlFor="coupon">Coupon</label>
+                <label className="text-black h4" htmlFor="coupon">
+                  Coupon
+                </label>
                 <p>Enter your coupon code if you have one.</p>
                 <div className="row">
                   <div className="col-md-8 mb-3 mb-md-0">
@@ -129,8 +140,13 @@ const Cart = ({ cartItems = [], updateQuantity, removeFromCart }) => {
                     />
                   </div>
                   <div className="col-md-4">
-                    <button className="btn btn-black" onClick={handleApplyCoupon}
-                      style={{ backgroundColor: "#385174", color: "#fff" }}>Apply Coupon</button>
+                    <button
+                      className="btn btn-black"
+                      onClick={handleApplyCoupon}
+                      style={{ backgroundColor: "#385174", color: "#fff" }}
+                    >
+                      Apply Coupon
+                    </button>
                   </div>
                 </div>
               </div>
@@ -142,7 +158,9 @@ const Cart = ({ cartItems = [], updateQuantity, removeFromCart }) => {
               <div className="col-md-7">
                 <div className="row">
                   <div className="col-md-12 text-right border-bottom mb-5">
-                    <h3 className="text-black h4 text-uppercase">Cart Totals</h3>
+                    <h3 className="text-black h4 text-uppercase">
+                      Cart Totals
+                    </h3>
                   </div>
                 </div>
                 <div className="row mb-3">
@@ -150,7 +168,9 @@ const Cart = ({ cartItems = [], updateQuantity, removeFromCart }) => {
                     <span className="text-black">Subtotal</span>
                   </div>
                   <div className="col-md-6 text-right">
-                    <strong className="text-black">€{getSubtotal().toFixed(2)}</strong>
+                    <strong className="text-black">
+                      €{getSubtotal().toFixed(2)}
+                    </strong>
                   </div>
                 </div>
                 <div className="row mb-3">
@@ -159,7 +179,9 @@ const Cart = ({ cartItems = [], updateQuantity, removeFromCart }) => {
                   </div>
                   <div className="col-md-6 text-right">
                     <strong className="text-black">
-                      {getShippingCost() === 0 ? "Free" : `€${getShippingCost().toFixed(2)}`}
+                      {getShippingCost() === 0
+                        ? "Free"
+                        : `€${getShippingCost().toFixed(2)}`}
                     </strong>
                   </div>
                 </div>
@@ -169,7 +191,9 @@ const Cart = ({ cartItems = [], updateQuantity, removeFromCart }) => {
                       <span className="text-black">Discount</span>
                     </div>
                     <div className="col-md-6 text-right">
-                      <strong className="text-black">-€{(getSubtotal() * 0.1).toFixed(2)}</strong>
+                      <strong className="text-black">
+                        -€{(getSubtotal() * 0.1).toFixed(2)}
+                      </strong>
                     </div>
                   </div>
                 )}
@@ -178,19 +202,20 @@ const Cart = ({ cartItems = [], updateQuantity, removeFromCart }) => {
                     <span className="text-black">Total</span>
                   </div>
                   <div className="col-md-6 text-right">
-                    <strong className="text-black">€{getTotalPrice()}</strong>
+                    <strong className="text-black">
+                      €{getTotalPrice()}
+                    </strong>
                   </div>
                 </div>
                 <div className="row">
                   <div className="col-md-12">
-                  <button
-  className="btn btn-black btn-lg py-3 btn-block"
-  onClick={() => navigate("/checkout")}
-  style={{ backgroundColor: "#385174", color: "#fff" }} 
->
-  Proceed To Checkout
-</button>
-
+                    <button
+                      className="btn btn-black btn-lg py-3 btn-block"
+                      onClick={() => navigate("/checkout")}
+                      style={{ backgroundColor: "#385174", color: "#fff" }}
+                    >
+                      Proceed To Checkout
+                    </button>
                   </div>
                 </div>
               </div>
