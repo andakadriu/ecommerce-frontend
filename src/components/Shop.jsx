@@ -14,6 +14,10 @@ const Shop = ({ addToCart }) => {
   const itemsPerPage = 8;
 
   useEffect(() => {
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }, [location.search]);
+
+  useEffect(() => {
     const fetchAllProducts = async () => {
       try {
         const response = await axios.get(
@@ -53,7 +57,6 @@ const Shop = ({ addToCart }) => {
     setCurrentPage(pageNumber);
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
-  
 
   return (
     <div
