@@ -31,7 +31,6 @@ const ProductDetail = ({ addToCart }) => {
     fetchProduct();
   }, [id]);
 
-  // Convert product.stockQuantity to a number (if needed)
   const getNumericStock = () => {
     if (!product || product.stockQuantity == null) return 0;
     return typeof product.stockQuantity === "number"
@@ -64,7 +63,6 @@ const ProductDetail = ({ addToCart }) => {
     console.log("Available stock:", stock);
 
     if (quantity <= stock) {
-      // Call the parent's addToCart with the selected quantity
       addToCart({ ...product, quantity });
       console.log("Product added to cart successfully.");
     } else {

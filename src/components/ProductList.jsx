@@ -10,7 +10,9 @@ const ProductList = ({ products, setProducts }) => {
 
   const fetchProducts = async () => {
     try {
-      const response = await axios.get("https://localhost:7299/Product/ProductsList");
+      const response = await axios.get(
+        "https://localhost:7299/Product/ProductsList"
+      );
       setProducts(response.data);
     } catch (error) {
       console.error("Error fetching products:", error);
@@ -28,11 +30,13 @@ const ProductList = ({ products, setProducts }) => {
         setProducts((prev) => prev.filter((p) => p.productID !== id));
         console.log("Product deleted successfully");
       } catch (error) {
-        console.error("Error deleting product:", error.response ? error.response.data : error);
+        console.error(
+          "Error deleting product:",
+          error.response ? error.response.data : error
+        );
       }
     }
   };
-  
 
   useEffect(() => {
     fetchProducts();
@@ -64,35 +68,51 @@ const ProductList = ({ products, setProducts }) => {
                   <img
                     src={product.images}
                     alt={product.name}
-                    style={{ width: "50px", height: "50px", objectFit: "cover" }}
+                    style={{
+                      width: "50px",
+                      height: "50px",
+                      objectFit: "cover",
+                    }}
                   />
                 </td>
                 <td>{product.stockQuantity}</td>
-                <td>$ {product.price && !isNaN(product.price) ? product.price.toFixed(2) : "N/A"}</td>
                 <td>
-                 
-                  <Button size="sm" onClick={() => handleEdit(product.productID)} style={{backgroundColor:"#B3E5FC",border: "1px solid #B3E5FC" }}>
+                  ${" "}
+                  {product.price && !isNaN(product.price)
+                    ? product.price.toFixed(2)
+                    : "N/A"}
+                </td>
+                <td>
+                  <Button
+                    size="sm"
+                    onClick={() => handleEdit(product.productID)}
+                    style={{
+                      backgroundColor: "#B3E5FC",
+                      border: "1px solid #B3E5FC",
+                    }}
+                  >
                     Edit
-                  </Button> 
-                  <br/>
-                  <br/>
-                  <Button 
-  size="sm" 
-  onClick={() => handleDelete(product.productID)} 
-  style={{ 
-    backgroundColor: "#FFC1BD",
-    border: "1px solid #FFC1BD" 
-  }}
->
-  Delete
-</Button>
-
+                  </Button>
+                  <br />
+                  <br />
+                  <Button
+                    size="sm"
+                    onClick={() => handleDelete(product.productID)}
+                    style={{
+                      backgroundColor: "#FFC1BD",
+                      border: "1px solid #FFC1BD",
+                    }}
+                  >
+                    Delete
+                  </Button>
                 </td>
               </tr>
             ))
           ) : (
             <tr>
-              <td colSpan="7" className="text-center">No products available.</td>
+              <td colSpan="7" className="text-center">
+                No products available.
+              </td>
             </tr>
           )}
         </tbody>

@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import ScrollToTop from "./components/ScrollTop";
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
 import Shop from "./components/Shop";
@@ -25,7 +26,6 @@ const App = () => {
   const [products, setProducts] = useState([]);
   const [showPopup, setShowPopup] = useState(false);
 
-  // Updated addToCart function to use the passed quantity if available
   const addToCart = (product) => {
     const quantityToAdd = product.quantity ? product.quantity : 1;
     setCartItems((prevCart) => [
@@ -50,12 +50,12 @@ const App = () => {
     );
   };
 
-  // Hide header and footer on admin pages
   const hideHeaderFooter = window.location.pathname.startsWith("/admin");
 
   return (
     <Router>
-      <Navbar cartItems={cartItems} />
+      <ScrollToTop />
+      { <Navbar cartItems={cartItems} />}
       {showPopup && (
         <div className="cart-popup">
           Product added to cart!
@@ -100,7 +100,7 @@ const App = () => {
           <Route path="orders" element={<Orders />} />
         </Route>
       </Routes>
-      {!hideHeaderFooter && <Footer />}
+      { <Footer />}
     </Router>
   );
 };

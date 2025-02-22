@@ -1,8 +1,6 @@
-// AdminDashboard.js
 import React from "react";
 import { Container, Row, Col, Nav } from "react-bootstrap";
 import { Outlet, Link, useLocation } from "react-router-dom";
-
 import { Doughnut } from "react-chartjs-2";
 import { Chart as ChartJS, ArcElement, Tooltip, Legend } from "chart.js";
 ChartJS.register(ArcElement, Tooltip, Legend);
@@ -10,7 +8,6 @@ ChartJS.register(ArcElement, Tooltip, Legend);
 function AdminDashboard({ products, setProducts }) {
   const location = useLocation();
   const isDashboardHome = location.pathname === "/admin";
-
 
   const totalProducts = products.length;
   const totalStock = products.reduce((acc, prod) => acc + prod.stock, 0);
@@ -28,10 +25,13 @@ function AdminDashboard({ products, setProducts }) {
   };
 
   return (
-    <Container fluid>
+    <Container fluid style={{ marginTop: "130px" }}>
       <Row>
-        {/* Sidebar */}
-        <Col md={2} className="bg-light vh-100 p-0">
+        <Col 
+          md={2} 
+          className="bg-light p-0" 
+          style={{ height: "calc(100vh - 130px)" }}
+        >
           <Nav defaultActiveKey="/admin" className="flex-column p-3">
             <Nav.Link as={Link} to="/admin" eventKey="dashboard">
               Dashboard
@@ -48,7 +48,6 @@ function AdminDashboard({ products, setProducts }) {
           </Nav>
         </Col>
 
-        {/* Main Content */}
         <Col md={10} className="p-4">
           {isDashboardHome ? (
             <>

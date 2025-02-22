@@ -7,7 +7,7 @@ const Navbar = ({ cartItems }) => {
   const totalCartItems = cartItems.reduce((total, item) => total + item.quantity, 0);
 
   return (
-    <nav className="custom-navbar navbar navbar-expand-md navbar-dark">
+    <nav className="custom-navbar navbar navbar-expand-md navbar-dark fixed-top">
       <div className="container">
         <Link className="navbar-brand" to="/">
           BELLA MAISON<span>.</span>

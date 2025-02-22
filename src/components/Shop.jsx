@@ -51,7 +51,9 @@ const Shop = ({ addToCart }) => {
 
   const paginate = (pageNumber) => {
     setCurrentPage(pageNumber);
+    window.scrollTo({ top: 0, behavior: "smooth" });
   };
+  
 
   return (
     <div
