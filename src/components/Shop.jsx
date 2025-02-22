@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { useLocation } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import axios from "axios";
 import "../../src/assets/styles/style.css";
 
@@ -10,7 +10,6 @@ const Shop = ({ addToCart }) => {
 
   const [products, setProducts] = useState([]);
   const [filteredProducts, setFilteredProducts] = useState([]);
-
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 8;
 
@@ -25,7 +24,6 @@ const Shop = ({ addToCart }) => {
         console.error("Error fetching all products:", error);
       }
     };
-
     fetchAllProducts();
   }, []);
 
@@ -68,46 +66,50 @@ const Shop = ({ addToCart }) => {
         </h2>
         <div className="row">
           {currentProducts.map((product) => {
+            const productId = product._productID || product.productID;
             const imageUrl =
               Array.isArray(product.images) && product.images.length > 0
                 ? product.images[0]
                 : "/default-image.jpg";
             return (
-              <div
-                key={product.id || product.title}
-                className="col-12 col-md-4 col-lg-3 mb-5"
-              >
-                <div className="product-item p-3 border rounded">
-                  <img
-                    src={imageUrl}
-                    className="img-fluid product-thumbnail mb-3"
-                    alt={product.title || "Product"}
-                    style={{
-                      width: "100%",
-                      height: "200px",
-                      objectFit: "cover",
-                      borderRadius: "8px",
-                    }}
-                  />
-                  <h3
-                    className="product-title"
-                    style={{ fontSize: "1.2rem", fontWeight: "600" }}
-                  >
-                    {product.name}
-                  </h3>
-                  <strong className="product-price d-block mb-3">
-                    {product.price && !isNaN(product.price)
-                      ? `$${product.price.toFixed(2)}`
-                      : "N/A"}
-                  </strong>
-                  <div className="product-actions">
-                    <button
-                      onClick={() => addToCart(product)}
-                      className="btn btn-cart btn-sm"
+              <div key={productId} className="col-12 col-md-4 col-lg-3 mb-5">
+                <Link
+                  to={`/product/${productId}`}
+                  className="text-decoration-none"
+                >
+                  <div className="product-item p-3 border rounded">
+                    <img
+                      src={imageUrl}
+                      className="img-fluid product-thumbnail mb-3"
+                      alt={product.title || "Product"}
+                      style={{
+                        width: "100%",
+                        height: "200px",
+                        objectFit: "cover",
+                        borderRadius: "8px",
+                      }}
+                    />
+                    <h3
+                      className="product-title"
+                      style={{ fontSize: "1.2rem", fontWeight: "600" }}
                     >
-                      <i className="fas fa-shopping-cart"></i> Add to Cart
-                    </button>
+                      {product.name}
+                    </h3>
+                    <strong className="product-price d-block mb-3">
+                      {product.price && !isNaN(product.price)
+                        ? `$${Number(product.price).toFixed(2)}`
+                        : "N/A"}
+                    </strong>
                   </div>
+                </Link>
+
+                <div className="product-actions text-center mt-2">
+                  <button
+                    onClick={() => addToCart(product)}
+                    className="btn btn-cart btn-sm"
+                  >
+                    <i className="fas fa-shopping-cart"></i> Add to Cart
+                  </button>
                 </div>
               </div>
             );

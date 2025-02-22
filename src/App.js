@@ -18,16 +18,19 @@ import PopularProduct from "./components/PopularProducts";
 import WeHelpSection from "./components/WeHelpSection";
 import TestimonialSlider from "./components/TestimonialSlider";
 import BlogSection from "./components/BlogSection";
+import ProductDetail from "./components/ProductsDetail"; 
 
 const App = () => {
   const [cartItems, setCartItems] = useState([]);
   const [products, setProducts] = useState([]);
   const [showPopup, setShowPopup] = useState(false);
 
+  // Updated addToCart function to use the passed quantity if available
   const addToCart = (product) => {
+    const quantityToAdd = product.quantity ? product.quantity : 1;
     setCartItems((prevCart) => [
       ...prevCart,
-      { ...product, cartItemId: Date.now(), quantity: 1 } 
+      { ...product, cartItemId: Date.now(), quantity: quantityToAdd }
     ]);
     setShowPopup(true);
     setTimeout(() => setShowPopup(false), 2000);
@@ -47,11 +50,12 @@ const App = () => {
     );
   };
 
+  // Hide header and footer on admin pages
   const hideHeaderFooter = window.location.pathname.startsWith("/admin");
 
   return (
     <Router>
-      {<Navbar cartItems={cartItems} />}
+      <Navbar cartItems={cartItems} />
       {showPopup && (
         <div className="cart-popup">
           Product added to cart!
@@ -72,10 +76,7 @@ const App = () => {
             </>
           }
         />
-        <Route
-          path="/shop"
-          element={<Shop addToCart={addToCart} products={products} />}
-        />
+        <Route path="/shop" element={<Shop addToCart={addToCart} products={products} />} />
         <Route
           path="/cart"
           element={
@@ -86,32 +87,16 @@ const App = () => {
             />
           }
         />
+        <Route path="/product/:id" element={<ProductDetail addToCart={addToCart} products={products} />} />
         <Route path="/checkout" element={<Checkout cartItems={cartItems} />} />
         <Route path="/confirmation" element={<ConfirmationPage />} />
-        <Route
-          path="/admin/*"
-          element={
-            <AdminDashboard products={products} setProducts={setProducts} />
-          }
-        >
+        <Route path="/admin/*" element={<AdminDashboard products={products} setProducts={setProducts} />}>
           <Route
             path="add-product"
-            element={
-              <AddProduct
-                addNewProduct={(newProduct) =>
-                  setProducts([...products, newProduct])
-                }
-              />
-            }
+            element={<AddProduct addNewProduct={(newProduct) => setProducts([...products, newProduct])} />}
           />
-          <Route
-            path="products"
-            element={<ProductList products={products} setProducts={setProducts} />}
-          />
-          <Route
-            path="products/edit/:id"
-            element={<EditProduct products={products} setProducts={setProducts} />}
-          />
+          <Route path="products" element={<ProductList products={products} setProducts={setProducts} />} />
+          <Route path="products/edit/:id" element={<EditProduct products={products} setProducts={setProducts} />} />
           <Route path="orders" element={<Orders />} />
         </Route>
       </Routes>

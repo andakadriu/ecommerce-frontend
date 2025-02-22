@@ -53,7 +53,7 @@ const Cart = ({ cartItems = [], updateQuantity, removeFromCart }) => {
                 <tbody>
                   {cartItems.length === 0 ? (
                     <tr>
-                      <td colSpan="6" className="text-center">
+                      <td colSpan="5" className="text-center">
                         Your cart is empty
                       </td>
                     </tr>

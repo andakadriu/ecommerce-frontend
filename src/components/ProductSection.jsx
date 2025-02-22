@@ -1,59 +1,86 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
+import axios from 'axios';
 import '../../src/assets/styles/style.css';
-import img1 from "../../src/assets/styles/images/product-1.png";
-import img2 from "../../src/assets/styles/images/product-2.png";
-import img3 from "../../src/assets/styles/images/product-3.png";
+import cartIcon from '../../src/assets/styles/images/cart.svg'; 
 
-const ProductSection = () => {
+const ProductSection = ({ addToCart }) => {
+  const [randomProducts, setRandomProducts] = useState([]);
+
+  useEffect(() => {
+    const fetchAllProducts = async () => {
+      try {
+        const response = await axios.get("https://localhost:7299/Product/ProductsList");
+        const allProducts = response.data; 
+        if (Array.isArray(allProducts) && allProducts.length > 0) {
+          const shuffled = [...allProducts].sort(() => 0.5 - Math.random());
+          setRandomProducts(shuffled.slice(0, 3));
+        }
+      } catch (error) {
+        console.error("Error fetching all products:", error);
+      }
+    };
+
+    fetchAllProducts();
+  }, []);
+
   return (
     <div className="product-section">
       <div className="container">
         <div className="row">
-
           <div className="col-md-12 col-lg-3 mb-5 mb-lg-0">
             <h2 className="mb-4 section-title">Crafted with excellent material.</h2>
             <p className="mb-4">
               Donec vitae odio quis nisl dapibus malesuada. Nullam ac aliquet velit. Aliquam vulputate velit imperdiet dolor tempor tristique.
             </p>
-            <p><a href="shop.html" className="btn">Explore</a></p>
-          </div> 
-
-          <div className="col-12 col-md-4 col-lg-3 mb-5 mb-md-0">
-            <a className="product-item" href="cart.html">
-              <img src={img1} className="img-fluid product-thumbnail" alt="Nordic Chair" />
-              <h3 className="product-title">Nordic Chair</h3>
-              <strong className="product-price">$50.00</strong>
-
-              <span className="icon-cross">
-                <img src="images/cross.svg" className="img-fluid" alt="Cross Icon" />
-              </span>
-            </a>
-          </div> 
-
-          <div className="col-12 col-md-4 col-lg-3 mb-5 mb-md-0">
-            <a className="product-item" href="cart.html">
-              <img src={img2} className="img-fluid product-thumbnail" alt="Kruzo Aero Chair" />
-              <h3 className="product-title">Kruzo Aero Chair</h3>
-              <strong className="product-price">$78.00</strong>
-
-              <span className="icon-cross">
-                <img src="images/cross.svg" className="img-fluid" alt="Cross Icon" />
-              </span>
-            </a>
+            <p>
+              <Link to="/shop" className="btn">Explore</Link>
+            </p>
           </div>
 
-          <div className="col-12 col-md-4 col-lg-3 mb-5 mb-md-0">
-            <a className="product-item" href="cart.html">
-              <img src={img3} className="img-fluid product-thumbnail" alt="Ergonomic Chair" />
-              <h3 className="product-title">Ergonomic Chair</h3>
-              <strong className="product-price">$43.00</strong>
-
-              <span className="icon-cross">
-                <img src="images/cross.svg" className="img-fluid" alt="Cross Icon" />
-              </span>
-            </a>
-          </div>
-
+          {randomProducts.map((product, index) => {
+            const productId = product._id || product.id;
+            const imageUrl =
+              product.image ||
+              (Array.isArray(product.images) && product.images.length > 0
+                ? product.images[0]
+                : "/default-image.jpg");
+            return (
+              <div key={productId || index} className="col-12 col-md-4 col-lg-3 mb-5 mb-md-0">
+                <div className="product-item p-3 border rounded">
+                  <Link to={`/product/${productId}`} className="text-decoration-none d-block">
+                    <img
+                      src={imageUrl}
+                      className="img-fluid product-thumbnail mb-3"
+                      alt={product.title || product.name || "Product"}
+                      style={{
+                        width: "100%",
+                        height: "200px",
+                        objectFit: "cover",
+                        borderRadius: "8px",
+                      }}
+                    />
+                    <h3 className="product-title" style={{ fontSize: "1.2rem", fontWeight: "600" }}>
+                      {product.name}
+                    </h3>
+                    <strong className="product-price d-block mb-3">
+                      {product.price && !isNaN(product.price)
+                        ? `$${Number(product.price).toFixed(2)}`
+                        : "N/A"}
+                    </strong>
+                  </Link>
+                  <div className="d-flex justify-content-center mt-2">
+                    <button
+                      onClick={() => addToCart(product)}
+                      className="btn btn-cart btn-sm"
+                    >
+                      <img src={cartIcon} alt="Add to Cart" style={{ width: "18px", height: "18px" }} />
+                    </button>
+                  </div>
+                </div>
+              </div>
+            );
+          })}
         </div>
       </div>
     </div>

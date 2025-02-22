@@ -3,6 +3,7 @@ import React, { useState, useEffect } from "react";
 import { Container, Table, Button } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
+import { color } from "chart.js/helpers";
 
 const ProductList = ({ products, setProducts }) => {
   const navigate = useNavigate();
@@ -69,12 +70,23 @@ const ProductList = ({ products, setProducts }) => {
                 <td>{product.stockQuantity}</td>
                 <td>$ {product.price && !isNaN(product.price) ? product.price.toFixed(2) : "N/A"}</td>
                 <td>
-                  <Button variant="warning" size="sm" onClick={() => handleEdit(product.productID)}>
+                 
+                  <Button size="sm" onClick={() => handleEdit(product.productID)} style={{backgroundColor:"#B3E5FC",border: "1px solid #B3E5FC" }}>
                     Edit
-                  </Button>
-                  <Button variant="danger" size="sm" onClick={() => handleDelete(product.productID)}>
-                    Delete
-                  </Button>
+                  </Button> 
+                  <br/>
+                  <br/>
+                  <Button 
+  size="sm" 
+  onClick={() => handleDelete(product.productID)} 
+  style={{ 
+    backgroundColor: "#FFC1BD",
+    border: "1px solid #FFC1BD" 
+  }}
+>
+  Delete
+</Button>
+
                 </td>
               </tr>
             ))
