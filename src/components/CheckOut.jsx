@@ -22,6 +22,9 @@ const Checkout = ({ cartItems }) => {
   const getTotalPrice = () =>
     getSubtotal() + getShippingCost();
 
+  // Calculate total items (sum of quantities)
+  const totalItems = cartItems.reduce((sum, item) => sum + item.quantity, 0);
+
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
@@ -40,25 +43,31 @@ const Checkout = ({ cartItems }) => {
       return;
     }
 
-    
     const orderPayload = {
-      OrderID: 0, 
-      OrderStatus: "Confirmed", 
+      OrderID: 0,
+      OrderStatus: "Confirmed",
       TotalAmount: getSubtotal(),
       GrandTotal: getTotalPrice(),
+      TotalItems: totalItems,
+      QuantityOrdered: totalItems,
       FullName: formData.name,
       Email: formData.email,
       ShippingAddress: formData.address,
       City: formData.city,
       PhoneNumber: formData.phone,
-      Orders: [],  
+      Orders: [],
       Products: cartItems.map((item) => ({
         ProductID: item.productID || 0,
         QuantityOrdered: item.quantity,
         Price: item.price,
         Name: item.name || "",
         Description: item.description || "",
-        Images: item.images || []  
+        StockQuantity: item.stockQuantity || 0,
+        CategoryID: item.categoryID || 0,
+        Products: item.products || [],
+        IsDeleted: item.isDeleted || false,
+        Category: item.category || "",
+        Images: item.images || []
       }))
     };
 
@@ -78,7 +87,7 @@ const Checkout = ({ cartItems }) => {
         alert('Failed to place order. Please try again.');
       }
     } catch (error) {
-      console.error("Error placing order:", error);
+      console.error("Error placing order:", error.response ? error.response.data : error);
       alert('An error occurred while placing your order.');
     }
   };
