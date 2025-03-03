@@ -67,7 +67,7 @@ const App = () => {
           element={
             <>
               <HeroSection />
-              <ProductSection />
+              <ProductSection addToCart={addToCart} />
               <WhyChooseSection />
               <PopularProduct />
               <WeHelpSection />
