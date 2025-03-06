@@ -16,6 +16,8 @@ const Shop = ({ addToCart }) => {
   const itemsPerPage = 8;
   const [minPrice, setMinPrice] = useState(29);
   const [maxPrice, setMaxPrice] = useState(58);
+  const [sortOption, setSortOption] = useState("recommended");
+  const [searchQuery, setSearchQuery] = useState("");
 
   useEffect(() => {
     AOS.init({ duration: 1000, once: true }); 
@@ -48,9 +50,22 @@ const Shop = ({ addToCart }) => {
       const price = Number(product.price);
       return price >= minPrice && price <= maxPrice;
     });
+
+    if (searchQuery) {
+      newFiltered = newFiltered.filter((product) =>
+        product.name.toLowerCase().includes(searchQuery.toLowerCase())
+      );
+    }
+
+    if (sortOption === "price-low-high") {
+      newFiltered.sort((a, b) => Number(a.price) - Number(b.price));
+    } else if (sortOption === "price-high-low") {
+      newFiltered.sort((a, b) => Number(b.price) - Number(a.price));
+    }
+
     setFilteredProducts(newFiltered);
     setCurrentPage(1);
-  }, [category, products, minPrice, maxPrice]);
+  }, [category, products, minPrice, maxPrice, sortOption, searchQuery]);
 
   const totalPages = Math.ceil(filteredProducts.length / itemsPerPage);
   const indexOfLastProduct = currentPage * itemsPerPage;
@@ -66,12 +81,34 @@ const Shop = ({ addToCart }) => {
     <div className="shop-container container" data-aos="fade-up">
       <aside className="shop-sidebar" data-aos="fade-right">
         <h3 className="mb-4">Filter by</h3>
+        <input
+          type="text"
+          placeholder="Search product..."
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+          className="form-control mb-3"
+        />
         <div className="price-filter mb-4">
           <label className="d-block mb-2">Price</label>
-          <input type="range" min="29" max="58" className="w-100" />
+          <input
+            type="range"
+            min="29"
+            max="58"
+            value={minPrice}
+            onChange={(e) => setMinPrice(Number(e.target.value))}
+            className="w-100"
+          />
+          <input
+            type="range"
+            min="29"
+            max="58"
+            value={maxPrice}
+            onChange={(e) => setMaxPrice(Number(e.target.value))}
+            className="w-100"
+          />
           <div className="d-flex justify-content-between mt-1">
-            <span>$29</span>
-            <span>$58</span>
+            <span>${minPrice}</span>
+            <span>${maxPrice}</span>
           </div>
         </div>
       </aside>
@@ -85,10 +122,15 @@ const Shop = ({ addToCart }) => {
           </h2>
           <div className="sort-by">
             <label className="me-2">Sort by:</label>
-            <select className="form-select" style={{ width: "180px" }}>
-              <option>Recommended</option>
-              <option>Price: Low to High</option>
-              <option>Price: High to Low</option>
+            <select
+              className="form-select"
+              style={{ width: "180px" }}
+              value={sortOption}
+              onChange={(e) => setSortOption(e.target.value)}
+            >
+              <option value="recommended">Recommended</option>
+              <option value="price-low-high">Price: Low to High</option>
+              <option value="price-high-low">Price: High to Low</option>
             </select>
           </div>
         </div>
@@ -132,42 +174,10 @@ const Shop = ({ addToCart }) => {
                     </strong>
                   </div>
                 </Link>
-
-                <div className="product-actions text-center mt-2" data-aos="fade-up">
-                  <button onClick={() => addToCart(product)} className="btn btn-cart btn-sm">
-                    <i className="fas fa-shopping-cart"></i> Add to Cart
-                  </button>
-                </div>
               </div>
             );
           })}
         </div>
-
-        {filteredProducts.length === 0 && <p className="text-center">No products found in this category.</p>}
-
-        {totalPages > 1 && (
-          <nav data-aos="fade-up">
-            <ul className="pagination justify-content-center custom-pagination">
-              <li className={`page-item ${currentPage === 1 ? "disabled" : ""}`}>
-                <button className="page-link" onClick={() => currentPage > 1 && paginate(currentPage - 1)}>
-                  &laquo;
-                </button>
-              </li>
-              {Array.from({ length: totalPages }, (_, index) => index + 1).map((page) => (
-                <li key={page} className={`page-item ${currentPage === page ? "active" : ""}`}>
-                  <button className="page-link" onClick={() => paginate(page)}>
-                    {page}
-                  </button>
-                </li>
-              ))}
-              <li className={`page-item ${currentPage === totalPages ? "disabled" : ""}`}>
-                <button className="page-link" onClick={() => currentPage < totalPages && paginate(currentPage + 1)}>
-                  &raquo;
-                </button>
-              </li>
-            </ul>
-          </nav>
-        )}
       </div>
     </div>
   );
