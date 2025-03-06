@@ -8,11 +8,11 @@ const Footer = () => {
     <footer className="footer-section">
       <div className="container relative">
 
-        <div className="sofa-img">
+        {/* <div className="sofa-img">
           <img src={img1} alt="Sofa" className="img-fluid" />
-        </div>
+        </div> */}
 
-        <div className="row">
+        {/* <div className="row">
           <div className="col-lg-8">
             <div className="subscription-form">
               <h3 className="d-flex align-items-center">
@@ -37,7 +37,7 @@ const Footer = () => {
               </form>
             </div>
           </div>
-        </div>
+        </div> */}
 
         <div className="row g-5 mb-5">
           <div className="col-lg-4">
