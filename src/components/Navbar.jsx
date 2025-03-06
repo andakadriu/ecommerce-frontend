@@ -11,8 +11,8 @@ const Navbar = ({ cartItems = [] }) => {
   const closeMenu = () => setMenuOpen(false);
 
   return (
-    <nav className="custom-navbar navbar navbar-expand-md navbar-dark fixed-top">
-      <div className="container">
+<nav className={`custom-navbar navbar navbar-expand-md navbar-dark fixed-top ${menuOpen ? "show" : ""}`}>
+<div className="container">
         <div className="row align-items-center">
           <div className="col-8">
             <Link className="navbar-brand" to="/" onClick={closeMenu}>
@@ -20,16 +20,18 @@ const Navbar = ({ cartItems = [] }) => {
             </Link>
           </div>
           <div className="col-4 text-end">
-            <button
-              className="navbar-toggler"
-              type="button"
-              onClick={toggleMenu}
-              aria-controls="navbarContent"
-              aria-expanded={menuOpen}
-              aria-label="Toggle navigation"
-            >
-              <span className="navbar-toggler-icon"></span>
-            </button>
+          <button
+  className="navbar-toggler"
+  type="button"
+  onClick={toggleMenu}
+  aria-controls="navbarContent"
+  aria-expanded={menuOpen}
+  aria-label="Toggle navigation"
+   
+>
+  <span className="navbar-toggler-icon" style={{ filter: "invert(44%) sepia(10%) saturate(914%) hue-rotate(172deg) brightness(92%) contrast(92%)" }}></span>
+</button>
+
           </div>
         </div>
 

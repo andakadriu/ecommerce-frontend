@@ -70,21 +70,16 @@ const ProductSection = ({ addToCart }) => {
                     <h3 className="product-title" style={{ fontSize: "1.2rem", fontWeight: "600" }}>
                       {product.name}
                     </h3>
-                    <strong className="product-price d-block mb-3">
+                    <h1 className="product-price">
                       {product.price && !isNaN(product.price)
                         ? `$${Number(product.price).toFixed(2)}`
                         : "N/A"}
-                    </strong>
+                    </h1>
                   </div>
                 </Link>
-                <div className="product-actions text-center mt-2">
+                <div className="product-actions text-center mt-2" data-aos="fade-up">
                   <button onClick={() => addToCart(product)} className="btn btn-cart btn-sm">
-                    <img
-                      src={cartIcon}
-                      alt="Add to Cart"
-                      style={{ width: "18px", height: "18px" }}
-                    />{" "}
-                    Add to Cart
+                    <i className="fas fa-shopping-cart"></i> Add to Cart
                   </button>
                 </div>
               </div>

@@ -111,7 +111,7 @@ const ProductDetail = ({ addToCart }) => {
             <button className="plusminus btn btn-outline-dark quantity-increase" onClick={handleIncrease}>+</button>
           </div>
 
-          <button className="prbt btn btn-cart mt-3" onClick={handleAddToCart} style={{ fontSize: "20px", padding: "3px" }}>
+          <button className="prbt btn btn-cart mt-3" onClick={handleAddToCart} style={{ fontSize: "20px", padding: "3px", backgroundColor:"#385174" }}>
             <i className="fas fa-shopping-cart"></i> Add to Cart
           </button>
         </div>
@@ -134,11 +134,11 @@ const ProductDetail = ({ addToCart }) => {
                   <strong className="product-price d-block mb-3">${Number(suggestedProduct.price).toFixed(2)}</strong>
                 </div>
               </Link>
-              <div className="product-actions text-center mt-2">
-                <button onClick={() => addToCart(suggestedProduct)} className="btn btn-cart btn-sm">
-                  <img src={cartIcon} alt="Add to Cart" style={{ width: "18px", height: "18px" }} /> Add to Cart
-                </button>
-              </div>
+              <div className="product-actions text-center mt-2" data-aos="fade-up">
+                  <button onClick={() => addToCart(product)} className="btn btn-cart btn-sm">
+                    <i className="fas fa-shopping-cart"></i> Add to Cart
+                  </button>
+                </div>
             </div>
           ))}
         </div>
