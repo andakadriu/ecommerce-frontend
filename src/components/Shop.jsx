@@ -78,105 +78,107 @@ const Shop = ({ addToCart }) => {
   };
 
   return (
-    <div className="shop-container container" data-aos="fade-up">
-      <aside className="shop-sidebar" data-aos="fade-right">
-        <h3 className="mb-4">Filter by</h3>
-        <input
-          type="text"
-          placeholder="Search product..."
-          value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
-          className="form-control mb-3"
-        />
-        <div className="price-filter mb-4">
-          <label className="d-block mb-2">Price</label>
+    <div className="shop-container container-fluid" data-aos="fade-up">
+      <div className="row">
+        <aside className="shop-sidebar col-lg-3 col-md-4 col-12" data-aos="fade-right">
+          <h3 className="mb-4">Filter by</h3>
           <input
-            type="range"
-            min="29"
-            max="58"
-            value={minPrice}
-            onChange={(e) => setMinPrice(Number(e.target.value))}
-            className="w-100"
+            type="text"
+            placeholder="Search product..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="form-control mb-3"
           />
-          <input
-            type="range"
-            min="29"
-            max="58"
-            value={maxPrice}
-            onChange={(e) => setMaxPrice(Number(e.target.value))}
-            className="w-100"
-          />
-          <div className="d-flex justify-content-between mt-1">
-            <span>${minPrice}</span>
-            <span>${maxPrice}</span>
+          <div className="price-filter mb-4">
+            <label className="d-block mb-2">Price</label>
+            <input
+              type="range"
+              min="29"
+              max="58"
+              value={minPrice}
+              onChange={(e) => setMinPrice(Number(e.target.value))}
+              className="w-100"
+            />
+            <input
+              type="range"
+              min="29"
+              max="58"
+              value={maxPrice}
+              onChange={(e) => setMaxPrice(Number(e.target.value))}
+              className="w-100"
+            />
+            <div className="d-flex justify-content-between mt-1">
+              <span>${minPrice}</span>
+              <span>${maxPrice}</span>
+            </div>
           </div>
-        </div>
-      </aside>
+        </aside>
 
-      <div className="shop-main">
-        <div className="shop-main-header mb-4" data-aos="fade-left">
-          <h2 className="m-0">
-            {category === "all"
-              ? "All Products"
-              : category.charAt(0).toUpperCase() + category.slice(1) + " Products"}
-          </h2>
-          <div className="sort-by">
-            <label className="me-2">Sort by:</label>
-            <select
-              className="form-select"
-              style={{ width: "180px" }}
-              value={sortOption}
-              onChange={(e) => setSortOption(e.target.value)}
-            >
-              <option value="recommended">Recommended</option>
-              <option value="price-low-high">Price: Low to High</option>
-              <option value="price-high-low">Price: High to Low</option>
-            </select>
-          </div>
-        </div>
-
-        <p className="mb-3">{filteredProducts.length} products</p>
-
-        <div className="row">
-          {currentProducts.map((product, index) => {
-            const productId = product._productID || product.productID;
-            const imageUrl =
-              Array.isArray(product.images) && product.images.length > 0
-                ? product.images[0]
-                : "/default-image.jpg";
-            return (
-              <div
-                key={productId}
-                className="col-12 col-md-6 col-lg-4 col-xl-3 mb-5"
-                data-aos="fade-up"
-                data-aos-delay={index * 100}
+        <div className="shop-main col-lg-9 col-md-8 col-12">
+          <div className="shop-main-header mb-4 d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center" data-aos="fade-left">
+            <h2 className="m-0">
+              {category === "all"
+                ? "All Products"
+                : category.charAt(0).toUpperCase() + category.slice(1) + " Products"}
+            </h2>
+            <div className="sort-by mt-3 mt-md-0">
+              <label className="me-2">Sort by:</label>
+              <select
+                className="form-select"
+                style={{ width: "180px" }}
+                value={sortOption}
+                onChange={(e) => setSortOption(e.target.value)}
               >
-                <Link to={`/product/${productId}`} className="text-decoration-none">
-                  <div className="product-item p-3 border rounded">
-                    <img
-                      src={imageUrl}
-                      className="img-fluid product-thumbnail mb-3"
-                      alt={product.title || "Product"}
-                      style={{
-                        width: "100%",
-                        height: "200px",
-                        objectFit: "cover",
-                        borderRadius: "8px",
-                      }}
-                    />
-                    <h3 className="product-title" style={{ fontSize: "1.2rem", fontWeight: "600" }}>
-                      {product.name}
-                    </h3>
-                    <strong className="product-price d-block mb-3">
-                      {product.price && !isNaN(product.price)
-                        ? `$${Number(product.price).toFixed(2)}`
-                        : "N/A"}
-                    </strong>
-                  </div>
-                </Link>
-              </div>
-            );
-          })}
+                <option value="recommended">Recommended</option>
+                <option value="price-low-high">Price: Low to High</option>
+                <option value="price-high-low">Price: High to Low</option>
+              </select>
+            </div>
+          </div>
+
+          <p className="mb-3">{filteredProducts.length} products</p>
+
+          <div className="row">
+            {currentProducts.map((product, index) => {
+              const productId = product._productID || product.productID;
+              const imageUrl =
+                Array.isArray(product.images) && product.images.length > 0
+                  ? product.images[0]
+                  : "/default-image.jpg";
+              return (
+                <div
+                  key={productId}
+                  className="col-12 col-sm-6 col-md-4 col-lg-3 mb-4"
+                  data-aos="fade-up"
+                  data-aos-delay={index * 100}
+                >
+                  <Link to={`/product/${productId}`} className="text-decoration-none">
+                    <div className="product-item p-3 border rounded">
+                      <img
+                        src={imageUrl}
+                        className="img-fluid product-thumbnail mb-3"
+                        alt={product.title || "Product"}
+                        style={{
+                          width: "100%",
+                          height: "200px",
+                          objectFit: "cover",
+                          borderRadius: "8px",
+                        }}
+                      />
+                      <h3 className="product-title" style={{ fontSize: "1.2rem", fontWeight: "600" }}>
+                        {product.name}
+                      </h3>
+                      <strong className="product-price d-block mb-3">
+                        {product.price && !isNaN(product.price)
+                          ? `$${Number(product.price).toFixed(2)}`
+                          : "N/A"}
+                      </strong>
+                    </div>
+                  </Link>
+                </div>
+              );
+            })}
+          </div>
         </div>
       </div>
     </div>
