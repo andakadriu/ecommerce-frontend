@@ -27,7 +27,7 @@ const Orders = () => {
   };
 
   return (
-    <div className="container">
+    <div>
       <h3 className="mb-4">View Orders</h3>
       <table className="table table-hover">
         <thead>

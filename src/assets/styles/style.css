@@ -1278,7 +1278,7 @@ button {
 }
 
 .shop-main {
-  flex: 1;  /* takes remaining space */
+  flex: 1;  
 }
 
 .shop-main-header {
@@ -1303,7 +1303,6 @@ button {
   font-weight: 500;
 }
 
-/* Range input style (optional) */
 input[type="range"] {
   -webkit-appearance: none;
   height: 4px;
@@ -1331,15 +1330,17 @@ input[type="range"]::-moz-range-thumb {
   cursor: pointer;
 }
 
-/* Checkbox label adjustments */
 .form-check-label {
   margin-left: 5px;
   cursor: pointer;
 }
 .shop-container {
-  margin-top: 130px; /* Adjust based on navbar height */
+  margin-top: 130px; 
 }
 
 .nav-link img  {
   filter: invert(32%) sepia(10%) saturate(914%) hue-rotate(172deg) brightness(92%) contrast(92%);
+}
+.sidebar-container {
+  padding-top: 60px;
 }
