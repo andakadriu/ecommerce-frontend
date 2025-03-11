@@ -20,6 +20,7 @@ import WeHelpSection from "./components/WeHelpSection";
 import TestimonialSlider from "./components/TestimonialSlider";
 import BlogSection from "./components/BlogSection";
 import ProductDetail from "./components/ProductsDetail"; 
+import WhatsAppButton from "./components/WhatsAppButton";
 
 const App = () => {
   const [cartItems, setCartItems] = useState([]);
@@ -100,6 +101,7 @@ const App = () => {
           <Route path="orders" element={<Orders />} />
         </Route>
       </Routes>
+      <WhatsAppButton /> 
       { <Footer />}
     </Router>
   );

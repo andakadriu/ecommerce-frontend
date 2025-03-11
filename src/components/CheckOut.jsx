@@ -1,28 +1,24 @@
-import React, { useState } from 'react';
-import axios from 'axios';
-import { useNavigate } from 'react-router-dom';
+import React, { useState } from "react";
+import axios from "axios";
+import { useNavigate } from "react-router-dom";
+import { FaUser, FaEnvelope, FaMapMarkerAlt, FaCity, FaPhone, FaLock } from "react-icons/fa";
+import "bootstrap/dist/css/bootstrap.min.css";
+import "../assets/styles/style.css";
 
 const Checkout = ({ cartItems }) => {
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
-    name: '',
-    email: '',
-    address: '',
-    city: '',
-    phone: ''
+    name: "",
+    email: "",
+    address: "",
+    city: "",
+    phone: "",
   });
-  const [orderPlaced, setOrderPlaced] = useState(false);
 
-  const getSubtotal = () =>
-    cartItems.reduce((total, item) => total + item.price * item.quantity, 0);
+  const getSubtotal = () => cartItems.reduce((total, item) => total + item.price * item.quantity, 0);
+  const getShippingCost = () => (getSubtotal() >= 50 ? 0 : 2);
+  const getTotalPrice = () => getSubtotal() + getShippingCost();
 
-  const getShippingCost = () =>
-    getSubtotal() >= 50 ? 0 : 2;
-
-  const getTotalPrice = () =>
-    getSubtotal() + getShippingCost();
-
-  // Calculate total items (sum of quantities)
   const totalItems = cartItems.reduce((sum, item) => sum + item.quantity, 0);
 
   const handleChange = (e) => {
@@ -32,14 +28,8 @@ const Checkout = ({ cartItems }) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (
-      !formData.name ||
-      !formData.email ||
-      !formData.address ||
-      !formData.city ||
-      !formData.phone
-    ) {
-      alert('Please fill in all fields.');
+    if (Object.values(formData).some((value) => value.trim() === "")) {
+      alert("Please fill in all fields.");
       return;
     }
 
@@ -49,159 +39,77 @@ const Checkout = ({ cartItems }) => {
       TotalAmount: getSubtotal(),
       GrandTotal: getTotalPrice(),
       TotalItems: totalItems,
-      QuantityOrdered: totalItems,
       FullName: formData.name,
       Email: formData.email,
       ShippingAddress: formData.address,
       City: formData.city,
       PhoneNumber: formData.phone,
-      Orders: [],
       Products: cartItems.map((item) => ({
         ProductID: item.productID || 0,
         QuantityOrdered: item.quantity,
         Price: item.price,
         Name: item.name || "",
         Description: item.description || "",
-        StockQuantity: item.stockQuantity || 0,
-        CategoryID: item.categoryID || 0,
-        Products: item.products || [],
-        IsDeleted: item.isDeleted || false,
-        Category: item.category || "",
-        Images: item.images || []
-      }))
+      })),
     };
 
-    console.log('Order Payload:', orderPayload);
-
     try {
-      const response = await axios.post(
-        "https://localhost:7299/Order/CheckoutOrder",
-        orderPayload,
-        { headers: { 'Content-Type': 'application/json' } }
-      );
+      const response = await axios.post("https://localhost:7299/Order/CheckoutOrder", orderPayload, {
+        headers: { "Content-Type": "application/json" },
+      });
+
       if (response.status === 200) {
-        setOrderPlaced(true);
-        alert('Thank you! Your order has been placed successfully.');
-        navigate('/confirmation');
+        alert("Thank you! Your order has been placed successfully.");
+        navigate("/confirmation");
       } else {
-        alert('Failed to place order. Please try again.');
+        alert("Failed to place order. Please try again.");
       }
     } catch (error) {
-      console.error("Error placing order:", error.response ? error.response.data : error);
-      alert('An error occurred while placing your order.');
+      console.error("Error placing order:", error);
+      alert("An error occurred while placing your order.");
     }
   };
 
-  const totalAmount = getSubtotal();
-
   return (
-    <div className="untree_co-section before-footer-section">
-      <div className="container">
-        <div className="row mb-5">
-          <div className="col-md-12">
-            <h2 className="text-black h4 text-uppercase">Checkout</h2>
+    <div className="checkout-container">
+      <div className="checkout-image">
+        <h2>Secure & Fast Checkout</h2>
+      </div>
+      <div className="checkout-content">
+        <form onSubmit={handleSubmit} className="checkout-form">
+          <h3>Billing Details</h3>
+          <div className="form-group">
+            <FaUser className="icon" />
+            <input type="text" name="name" placeholder="Full Name" value={formData.name} onChange={handleChange} required />
           </div>
-        </div>
-        <div className="row">
-          <div className="col-md-6">
-            <form onSubmit={handleSubmit} className="mb-5">
-              <div className="form-group">
-                <label className="text-black" htmlFor="name">Full Name</label>
-                <input
-                  type="text"
-                  name="name"
-                  className="form-control"
-                  placeholder="Enter your name"
-                  value={formData.name}
-                  onChange={handleChange}
-                  required
-                />
-              </div>
-              <div className="form-group">
-                <label className="text-black" htmlFor="email">Email</label>
-                <input
-                  type="email"
-                  name="email"
-                  className="form-control"
-                  placeholder="Enter your email"
-                  value={formData.email}
-                  onChange={handleChange}
-                  required
-                />
-              </div>
-              <div className="form-group">
-                <label className="text-black" htmlFor="address">Shipping Address</label>
-                <input
-                  type="text"
-                  name="address"
-                  className="form-control"
-                  placeholder="Enter your address"
-                  value={formData.address}
-                  onChange={handleChange}
-                  required
-                />
-              </div>
-              <div className="form-group">
-                <label className="text-black" htmlFor="city">City</label>
-                <input
-                  type="text"
-                  name="city"
-                  className="form-control"
-                  placeholder="Enter your city"
-                  value={formData.city}
-                  onChange={handleChange}
-                  required
-                />
-              </div>
-              <div className="form-group">
-                <label className="text-black" htmlFor="phone">Phone Number</label>
-                <input
-                  type="text"
-                  name="phone"
-                  className="form-control"
-                  placeholder="Enter your phone number"
-                  value={formData.phone}
-                  onChange={handleChange}
-                  required
-                />
-              </div>
-              <br />
-              <button
-                type="submit"
-                className="btn btn-black btn-lg btn-block"
-                style={{ backgroundColor: "#385174", color: "#fff" }}
-              >
-                Place Order
-              </button>
-            </form>
+          <div className="form-group">
+            <FaEnvelope className="icon" />
+            <input type="email" name="email" placeholder="Email" value={formData.email} onChange={handleChange} required />
           </div>
-          <div className="col-md-6 pl-5">
-            <div className="row justify-content-end">
-              <div className="col-md-7">
-                <div className="row">
-                  <div className="col-md-12 text-right border-bottom mb-5">
-                    <h3 className="text-black h4 text-uppercase">Order Summary</h3>
-                  </div>
-                </div>
-                <div className="row mb-3">
-                  <div className="col-md-6">
-                    <span className="text-black">Subtotal</span>
-                  </div>
-                  <div className="col-md-6 text-right">
-                    <strong className="text-black">${totalAmount.toFixed(2)}</strong>
-                  </div>
-                </div>
-                <div className="row mb-5">
-                  <div className="col-md-6">
-                    <span className="text-black">Total</span>
-                  </div>
-                  <div className="col-md-6 text-right">
-                    <strong className="text-black">${getTotalPrice().toFixed(2)}</strong>
-                  </div>
-                </div>
-              </div>
-            </div>
+          <div className="form-group">
+            <FaMapMarkerAlt className="icon" />
+            <input type="text" name="address" placeholder="Shipping Address" value={formData.address} onChange={handleChange} required />
           </div>
+          <div className="form-group">
+            <FaCity className="icon" />
+            <input type="text" name="city" placeholder="City" value={formData.city} onChange={handleChange} required />
+          </div>
+          <div className="form-group">
+            <FaPhone className="icon" />
+            <input type="text" name="phone" placeholder="Phone Number" value={formData.phone} onChange={handleChange} required />
+          </div>
+          <button type="submit" className="checkout-btn">Place Order</button>
+        </form>
+
+        <div className="order-summary">
+          <h3>Order Summary</h3>
+          <p>Subtotal: <strong>${getSubtotal().toFixed(2)}</strong></p>
+          <p>Shipping: <strong>${getShippingCost().toFixed(2)}</strong></p>
+          <p className="total">Total: <strong>${getTotalPrice().toFixed(2)}</strong></p>
+          {/* <div className="secure-payment">
+            <FaLock className="lock-icon" />
+            <span>Secure Payment</span>
+          </div> */}
         </div>
       </div>
     </div>
