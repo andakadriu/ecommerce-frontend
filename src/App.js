@@ -72,7 +72,7 @@ const App = () => {
               <PopularProduct />
               <WeHelpSection />
               <TestimonialSlider />
-              <BlogSection />
+              {/* <BlogSection /> */}
             </>
           }
         />
