@@ -1472,3 +1472,56 @@ input {
 .whatsapp-icon {
   font-size: 28px;
 }
+/* login css */
+.login-container {
+  display: flex;
+  height: 100vh;
+}
+
+.background-image {
+  flex: 1;
+  background-image: url("../styles/images/6.png");
+  background-size: cover;
+  background-position: center;
+}
+
+.login-form {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 2rem;
+}
+
+.login-form h2 {
+  margin-bottom: 1rem;
+}
+
+.login-form form {
+  display: flex;
+  flex-direction: column;
+}
+
+.login-form .form-group {
+  margin-bottom: 1rem;
+}
+
+.login-form input[type="email"],
+.login-form input[type="password"] {
+  padding: 0.5rem;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+.login-form button {
+  padding: 0.5rem 1rem;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.form-button-container{
+  margin-right: 300px;
+}

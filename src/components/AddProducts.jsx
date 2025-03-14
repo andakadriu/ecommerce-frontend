@@ -3,93 +3,111 @@ import { Container, Form, Button } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 
-const AddProduct = ({ addNewProduct }) => {
+const AddProduct = () => {
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
     name: "",
     description: "",
-    categoryID: "", // Use categoryID here for the dropdown
-    images: [],
+    categoryID: "",
     stockQuantity: "",
     price: "",
+    discountValue: "",  // New field for discount
+    newPrice: "", // Auto-calculated field
+    images: [],
   });
-  const [categories, setCategories] = useState([]);
 
-  // Fetch categories when component mounts
+  const [categories, setCategories] = useState([]);
+  const [imagePreviews, setImagePreviews] = useState([]);
+
   useEffect(() => {
     const fetchCategories = async () => {
       const token = localStorage.getItem("token");
       try {
         const response = await axios.get("https://localhost:7299/Category/CategoriesList", {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
+          headers: { Authorization: `Bearer ${token}` },
         });
-        setCategories(response.data); // Set categories in state
+        setCategories(response.data);
       } catch (error) {
         console.error("Error fetching categories:", error);
       }
     };
-    
+
     fetchCategories();
   }, []);
 
-  // Handle input changes
+  // Calculate New Price when Price or Discount changes
+  useEffect(() => {
+    if (formData.price && formData.discountValue) {
+      const price = parseFloat(formData.price);
+      const discount = parseFloat(formData.discountValue);
+      if (!isNaN(price) && !isNaN(discount)) {
+        const newPrice = (price - (price * discount / 100)) || 0;
+        setFormData((prev) => ({ ...prev, newPrice: Number(newPrice.toFixed(2)) }));
+        
+      }
+    }
+  }, [formData.price, formData.discountValue]);
+
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  // Handle image file changes
   const handleFileChange = (e) => {
     const files = Array.from(e.target.files);
-    const fileUrls = [];
-    files.forEach((file) => {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        fileUrls.push(reader.result);
-        if (fileUrls.length === files.length) {
-          setFormData((prev) => ({
-            ...prev,
-            images: fileUrls,
-          }));
-        }
-      };
-      reader.readAsDataURL(file);
-    });
+    setFormData((prev) => ({ ...prev, images: files }));
+    setImagePreviews(files.map((file) => URL.createObjectURL(file)));
   };
 
-  // Handle form submission
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    const newProduct = {
-      name: formData.name,
-      description: formData.description,
-      categoryID: formData.categoryID, // Use categoryID
-      images: formData.images,
-      stockQuantity: parseInt(formData.stockQuantity, 10),
-      price: parseFloat(formData.price),
-    };
 
-    axios
-      .post("https://localhost:7299/Product/Create", newProduct)
-      .then((response) => {
-        const addedProduct = response.data;
-        addNewProduct(addedProduct); // Add the newly added product to the list
-        setFormData({
-          name: "",
-          description: "",
-          categoryID: "",
-          images: [],
-          stockQuantity: "",
-          price: "",
+    const data = new FormData();
+    data.append("Name", formData.name);
+    data.append("Description", formData.description);
+    data.append("CategoryID", formData.categoryID);
+    data.append("StockQuantity", formData.stockQuantity);
+    data.append("Price", formData.price);
+    data.append("DiscountValue", formData.discountValue || 0);
+
+    for (let i = 0; i < formData.images.length; i++) {
+        data.append("Images", formData.images[i]);
+    }
+
+    try {
+        const response = await axios.post("https://localhost:7299/Product/Create", data, {
+            headers: {
+                "Content-Type": "multipart/form-data",
+            },
         });
-        navigate("/admin/products"); // Redirect to the product list page
-      })
-      .catch((error) => {
+
+        console.log("Response:", response);
+
+        if (response.status === 200 && response.data === true) {
+            alert("Product added successfully!");
+            setFormData({
+                name: "",
+                description: "",
+                categoryID: "",
+                stockQuantity: "",
+                price: "",
+                discountValue: "",
+                newPrice: "",
+                images: [],
+            });
+            setImagePreviews([]);
+            navigate("/admin/products");
+        } else {
+            console.error("Unexpected response:", response.data);
+            alert(`Unexpected response: ${JSON.stringify(response.data)}`);
+        }
+    } catch (error) {
         console.error("Error adding product:", error.response?.data || error);
-      });
-  };
+        alert(`Failed to add product: ${error.response?.data?.message || error.message}`);
+    }
+};
+
+
 
   return (
     <Container>
@@ -97,102 +115,55 @@ const AddProduct = ({ addNewProduct }) => {
       <Form onSubmit={handleSubmit}>
         <Form.Group controlId="formName" className="mb-3">
           <Form.Label>Product Name</Form.Label>
-          <Form.Control
-            type="text"
-            name="name"
-            placeholder="Enter product name"
-            value={formData.name}
-            onChange={handleInputChange}
-            required
-          />
+          <Form.Control type="text" name="name" placeholder="Enter product name" value={formData.name} onChange={handleInputChange} required />
         </Form.Group>
 
         <Form.Group controlId="formDescription" className="mb-3">
           <Form.Label>Description</Form.Label>
-          <Form.Control
-            as="textarea"
-            name="description"
-            placeholder="Enter product description"
-            value={formData.description}
-            onChange={handleInputChange}
-            required
-          />
+          <Form.Control as="textarea" name="description" placeholder="Enter product description" value={formData.description} onChange={handleInputChange} required />
         </Form.Group>
 
         <Form.Group controlId="formCategory" className="mb-3">
           <Form.Label>Category</Form.Label>
-          <select
-            name="categoryID" // Use categoryID for the dropdown
-            value={formData.categoryID}
-            onChange={handleInputChange}
-            className="form-control"
-            required
-          >
+          <Form.Control as="select" name="categoryID" value={formData.categoryID} onChange={handleInputChange} required>
             <option value="">Select Category</option>
             {categories.map((category) => (
-              <option key={category.categoryID} value={category.categoryID}>
-                {category.name}
-              </option>
+              <option key={category.categoryID} value={category.categoryID}>{category.name}</option>
             ))}
-          </select>
+          </Form.Control>
         </Form.Group>
 
         <Form.Group controlId="formImages" className="mb-3">
           <Form.Label>Product Images</Form.Label>
-          <Form.Control
-            type="file"
-            name="images"
-            onChange={handleFileChange}
-            accept="image/*"
-            multiple
-            required
-          />
-          <div>
-            {formData.images && formData.images.map((image, index) => (
-              <img
-                key={index}
-                src={image}
-                alt={`Preview ${index}`}
-                style={{
-                  width: "100px",
-                  height: "100px",
-                  marginTop: "10px",
-                  objectFit: "cover",
-                  marginRight: "10px",
-                }}
-              />
+          <Form.Control type="file" name="images" onChange={handleFileChange} accept="image/*" multiple required />
+          <div className="mt-2">
+            {imagePreviews.map((image, index) => (
+              <img key={index} src={image} alt={`Preview ${index}`} style={{ width: "100px", height: "100px", objectFit: "cover", marginRight: "10px", marginTop: "10px" }} />
             ))}
           </div>
         </Form.Group>
 
         <Form.Group controlId="formStock" className="mb-3">
           <Form.Label>Stock</Form.Label>
-          <Form.Control
-            type="number"
-            name="stockQuantity"
-            placeholder="Enter stock quantity"
-            value={formData.stockQuantity}
-            onChange={handleInputChange}
-            required
-          />
+          <Form.Control type="number" name="stockQuantity" placeholder="Enter stock quantity" value={formData.stockQuantity} onChange={handleInputChange} required />
         </Form.Group>
 
         <Form.Group controlId="formPrice" className="mb-3">
           <Form.Label>Price</Form.Label>
-          <Form.Control
-            type="number"
-            step="0.01"
-            name="price"
-            placeholder="Enter price"
-            value={formData.price}
-            onChange={handleInputChange}
-            required
-          />
+          <Form.Control type="number" step="0.01" name="price" placeholder="Enter price" value={formData.price} onChange={handleInputChange} required />
         </Form.Group>
 
-        <Button variant="primary" type="submit">
-          Add Product
-        </Button>
+        <Form.Group controlId="formDiscount" className="mb-3">
+          <Form.Label>Discount (%)</Form.Label>
+          <Form.Control type="number" step="0.01" name="discountValue" placeholder="Enter discount value" value={formData.discountValue} onChange={handleInputChange} />
+        </Form.Group>
+
+        <Form.Group controlId="formNewPrice" className="mb-3">
+          <Form.Label>New Price (After Discount)</Form.Label>
+          <Form.Control type="text" value={(formData.newPrice || 0).toFixed(2)} readOnly />
+        </Form.Group>
+
+        <Button variant="primary" type="submit">Add Product</Button>
       </Form>
     </Container>
   );

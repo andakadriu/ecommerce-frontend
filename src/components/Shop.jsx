@@ -14,13 +14,13 @@ const Shop = ({ addToCart }) => {
   const [filteredProducts, setFilteredProducts] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 8;
-  const [minPrice, setMinPrice] = useState(29);
-  const [maxPrice, setMaxPrice] = useState(58);
+  const [minPrice, setMinPrice] = useState(0);
+  const [maxPrice, setMaxPrice] = useState(1000000);
   const [sortOption, setSortOption] = useState("recommended");
   const [searchQuery, setSearchQuery] = useState("");
 
   useEffect(() => {
-    AOS.init({ duration: 1000, once: true }); 
+    AOS.init({ duration: 1000, once: true });
   }, []);
 
   useEffect(() => {
@@ -31,9 +31,17 @@ const Shop = ({ addToCart }) => {
     const fetchAllProducts = async () => {
       try {
         const response = await axios.get("https://localhost:7299/Product/ProductsList");
-        setProducts(response.data);
+        console.log("API Response:", response.data); // ✅ Debugging API response
+
+        if (response.status === 200 && Array.isArray(response.data)) {
+          setProducts(response.data);
+        } else {
+          console.error("Unexpected response format:", response.data);
+          setProducts([]);
+        }
       } catch (error) {
         console.error("Error fetching all products:", error);
+        setProducts([]);
       }
     };
     fetchAllProducts();
@@ -41,11 +49,17 @@ const Shop = ({ addToCart }) => {
 
   useEffect(() => {
     let newFiltered = [...products];
+
+    console.log("Before Filtering:", newFiltered); // ✅ Debugging before filtering
+
     if (category !== "all") {
       newFiltered = newFiltered.filter(
-        (product) => product.category && product.category.toLowerCase() === category.toLowerCase()
+        (product) =>
+          product.categoryID &&
+          product.categoryID.toString() === category.toString()
       );
     }
+
     newFiltered = newFiltered.filter((product) => {
       const price = Number(product.price);
       return price >= minPrice && price <= maxPrice;
@@ -57,11 +71,7 @@ const Shop = ({ addToCart }) => {
       );
     }
 
-    if (sortOption === "price-low-high") {
-      newFiltered.sort((a, b) => Number(a.price) - Number(b.price));
-    } else if (sortOption === "price-high-low") {
-      newFiltered.sort((a, b) => Number(b.price) - Number(a.price));
-    }
+    console.log("After Filtering:", newFiltered); // ✅ Debugging after filtering
 
     setFilteredProducts(newFiltered);
     setCurrentPage(1);
@@ -93,16 +103,16 @@ const Shop = ({ addToCart }) => {
             <label className="d-block mb-2">Price</label>
             <input
               type="range"
-              min="29"
-              max="58"
+              min="0"
+              max="1000000"
               value={minPrice}
               onChange={(e) => setMinPrice(Number(e.target.value))}
               className="w-100"
             />
             <input
               type="range"
-              min="29"
-              max="58"
+              min="0"
+              max="1000000"
               value={maxPrice}
               onChange={(e) => setMaxPrice(Number(e.target.value))}
               className="w-100"
@@ -119,7 +129,7 @@ const Shop = ({ addToCart }) => {
             <h2 className="m-0">
               {category === "all"
                 ? "All Products"
-                : category.charAt(0).toUpperCase() + category.slice(1) + " Products"}
+                : `Category ${category} Products`}
             </h2>
             <div className="sort-by mt-3 mt-md-0">
               <label className="me-2">Sort by:</label>
@@ -139,60 +149,46 @@ const Shop = ({ addToCart }) => {
           <p className="mb-3">{filteredProducts.length} products</p>
 
           <div className={`row d-flex flex-wrap ${filteredProducts.length === 1 ? "justify-content-center" : ""}`}>
-  {currentProducts.map((product, index) => {
-    const productId = product._productID || product.productID;
-    const imageUrl =
-      Array.isArray(product.images) && product.images.length > 0
-        ? product.images[0]
-        : "/default-image.jpg";
+            {currentProducts.map((product, index) => {
+              const productId = product.productID || product.ProductID;
 
-    return (
-      <div
-        key={productId}
-        className="col-md mb-4"
-        data-aos="fade-up"
-        data-aos-delay={index * 100}
-      >
-        <Link to={`/product/${productId}`} className="text-decoration-none">
-          <div
-            className="product-item p-3 border rounded"
-            style={{
-              minWidth: "250px",
-              maxWidth: "300px",
-              margin: "0 auto", 
-            }}
-          >
-            <img
-              src={imageUrl}
-              className="img-fluid product-thumbnail mb-3"
-              alt={product.title || "Product"}
-              style={{
-                width: "100%",
-                height: "200px",
-                objectFit: "cover",
-                borderRadius: "8px",
-              }}
-            />
-            <h3 className="product-title" style={{ fontSize: "1.2rem", fontWeight: "600" }}>
-              {product.name}
-            </h3>
-            <strong className="product-price d-block mb-3">
-              {product.price && !isNaN(product.price)
-                ? `$${Number(product.price).toFixed(2)}`
-                : "N/A"}
-            </strong>
-            <div className="product-actions text-center mt-2" data-aos="fade-up">
-              <button onClick={() => addToCart(product)} className="btn btn-cart btn-sm">
-                <i className="fas fa-shopping-cart"></i> Add to Cart
-              </button>
-            </div>
+              // ✅ Extract full image URL correctly
+              const imageUrl =
+  Array.isArray(product.images) && product.images.length > 0
+    ? `https://localhost:7299${product.images[0].filePath}` // ✅ Fix: Ensure full API URL
+    : "/default-image.png"; // ✅ Use default if no image exists
+
+              return (
+                <div key={productId} className="col-md mb-4" data-aos="fade-up" data-aos-delay={index * 100}>
+                  <Link to={`/product/${productId}`} className="text-decoration-none">
+                    <div className="product-item p-3 border rounded" style={{ minWidth: "250px", maxWidth: "300px", margin: "0 auto" }}>
+                    <img
+  src={imageUrl} 
+  className="img-fluid product-thumbnail mb-3"
+  alt={product.name || "Product"}
+  style={{
+    width: "100%",
+    height: "200px",
+    objectFit: "cover",
+    borderRadius: "8px",
+  }}
+/>
+
+                      <h3 className="product-title" style={{ fontSize: "1.2rem", fontWeight: "600" }}>{product.name}</h3>
+                      <strong className="product-price d-block mb-3">
+                        {product.price && !isNaN(product.price) ? `$${Number(product.price).toFixed(2)}` : "N/A"}
+                      </strong>
+                      <div className="product-actions text-center mt-2" data-aos="fade-up">
+                        <button onClick={() => addToCart(product)} className="btn btn-cart btn-sm">
+                          <i className="fas fa-shopping-cart"></i> Add to Cart
+                        </button>
+                      </div>
+                    </div>
+                  </Link>
+                </div>
+              );
+            })}
           </div>
-        </Link>
-      </div>
-    );
-  })}
-</div>
-
         </div>
       </div>
     </div>
